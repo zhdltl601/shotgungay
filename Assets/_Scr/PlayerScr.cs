@@ -11,6 +11,7 @@ public class PlayerScr : MonoBehaviour
     public float speed;
     private Camera cam;
     public int bulletNum;
+    private Vector3 mousePosition;
     private void Awake()
     {
         rigidBody2D = GetComponent<Rigidbody2D>();
@@ -18,9 +19,15 @@ public class PlayerScr : MonoBehaviour
     }
     private void Update()
     {
+        GetMousePosition();
         PlayerInput();
         PlayerLook();
         PlayerMove();
+    }
+
+    private void GetMousePosition()
+    {
+        mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
     }
     private void PlayerInput()
     {
@@ -29,7 +36,11 @@ public class PlayerScr : MonoBehaviour
     }
     private void PlayerLook()
     {
-        mouse.transform.position = cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
+        mouse.transform.position = mousePosition + new Vector3(0, 0, 10);
+        vis.transform.localRotation = Quaternion.Euler(0,0, Mathf.Rad2Deg * Mathf.Atan2(vis.transform.position.y - mousePosition.y,
+            vis.transform.position.x - mousePosition.x) + 90);
+        print(Mathf.Rad2Deg * Mathf.Atan2(vis.transform.position.y - mousePosition.y,
+            vis.transform.position.x - mousePosition.x));
         //cam.transform.position = Vector3.Lerp(transform.position, mouse.transform.position, 0.25f) + new Vector3(0, 0 - 10);
     }
     private void PlayerMove()
