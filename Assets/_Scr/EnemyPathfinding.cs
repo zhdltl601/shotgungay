@@ -40,7 +40,7 @@ public class EnemyPathfinding : MonoBehaviour
         this.range = 4f;
     }
 
-    private void FixedUpdate()
+    public void DoMove()
     {
         this.StartFindPath((Vector2)this.transform.position, (Vector2)this.target.transform.position);
     }
