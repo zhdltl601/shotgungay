@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class EnemyState : MonoBehaviour
 {
+    private EnemyStatus _enemyStatus;
     private EnemyPathfinding _pathfinding;
     private bool playerFound;
     private bool attacked;
@@ -23,6 +24,7 @@ public class EnemyState : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _enemyStatus = GetComponent<EnemyStatus>();
         _pathfinding = GetComponent<EnemyPathfinding>();
         _state = State.Idle;
     }
@@ -88,7 +90,7 @@ public class EnemyState : MonoBehaviour
             
                 break;
             case State.Shoot:
-                    //총쏘는 스크립트
+                    _enemyStatus.Attack(player.transform);
                 break;
             case State.Attacked:
                     //플레이어로부터 멀어지는 스크립트

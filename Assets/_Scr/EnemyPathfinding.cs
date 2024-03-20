@@ -1,14 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class EnemyPathfinding : MonoBehaviour
-{ 
+{
+    private EnemyMove _enemyMove;
+    
     [Header("Path Finding")]
     public GameObject target;
     // 맵을 격자로 분할한다.
     EnemyAstar grid;
+    private Rigidbody2D rg2d;
     // 남은거리를 넣을 큐 생성.
     public Queue<Vector2> wayQueue = new Queue<Vector2>();
 
@@ -18,7 +22,6 @@ public class EnemyPathfinding : MonoBehaviour
     public static bool walkable = true;
 
     // 플레이어 이동/회전 속도 등 저장할 변수
-    public float moveSpeed;
     // 장애물/NPC 판단시 멈추게 할 범위
     public float range;
 
@@ -27,8 +30,11 @@ public class EnemyPathfinding : MonoBehaviour
 
     private void Awake()
     {
+        _enemyMove = GetComponent<EnemyMove>();
+        rg2d = GetComponent<Rigidbody2D>();
         // 격자 생성
         this.grid = GameObject.Find("Astar").GetComponent<EnemyAstar>();
+        print(grid);
         //grid = GetComponent<Grid>();
         walkable = true;
     }
@@ -36,14 +42,25 @@ public class EnemyPathfinding : MonoBehaviour
     {
         // 초깃값 초기화.
         this.isWalking = false;
-        this.moveSpeed = 20f;
         this.range = 4f;
+        DoMove();
     }
 
     public void DoMove()
     {
         this.StartFindPath((Vector2)this.transform.position, (Vector2)this.target.transform.position);
     }
+    private float time = 0f;
+    private void Update()
+    {
+        time += Time.deltaTime;
+        if (time > 0.5f)
+        {
+            DoMove();
+            time = 0f;
+        }
+    }
+
 
     // start to target 이동.
     public void StartFindPath(Vector2 startPos, Vector2 targetPos)
@@ -130,21 +147,18 @@ public class EnemyPathfinding : MonoBehaviour
         // 길을 찾았을 경우(계산 다 끝난경우) 이동시킴.
         if(pathSuccess == true)
         {
+            print("found way");
             // 이동중이라는 변수 ON
             this.isWalking = true;
             // wayQueue를 따라 이동시킨다.
-            while (this.wayQueue.Count > 0)
+            
+            if ((Vector2)this.transform.position == this.wayQueue.First())
             {
-                var dir = this.wayQueue.First() - (Vector2)this.transform.position;
-                this.gameObject.GetComponent<Rigidbody2D>().velocity = dir.normalized * moveSpeed * 5 * Time.deltaTime;
-                if ((Vector2)this.transform.position == this.wayQueue.First())
-                {
-                    Debug.Log("Dequeue");
-                    this.wayQueue.Dequeue();
-                }
-                yield return new WaitForSeconds(0.02f);
+                Debug.Log("Dequeue");
+                this.wayQueue.Dequeue();
             }
-            // 이동중이라는 변수 OFF
+            _enemyMove.SetQueue(wayQueue);
+            
             this.isWalking = false;
         }
     }

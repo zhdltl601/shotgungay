@@ -55,6 +55,18 @@ public class EnemyAstar : MonoBehaviour
         CreateGrid();
         // 격자 생성
     }
+    private float time = 0f;
+    private void Update()
+    {
+        time += Time.deltaTime;
+        if (time > 0.5f)
+        {
+            nodeDiameter = nodeRadius * 2;
+            gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
+            gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
+            CreateGrid();
+        }
+    }
 
 
     // A*에서 사용할 PATH.
