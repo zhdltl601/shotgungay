@@ -8,6 +8,7 @@ public class EnemyState : MonoBehaviour
 {
     private EnemyStatus _enemyStatus;
     private EnemyMove _enemyMove;
+    private Shotgun _shotgun;
     private bool playerFound;
     private bool attacked;
     public float PlayerDetectRange;
@@ -32,7 +33,10 @@ public class EnemyState : MonoBehaviour
         _state = State.Move;
     }
 
-    
+    public void PlayerAimed()
+    {
+        _state = State.Shoot;
+    }
     void CheckIsPlayerInRange()
     {
         if (PlayerDetectRange > Vector2.Distance(transform.position, target.transform.position))
@@ -98,16 +102,25 @@ public class EnemyState : MonoBehaviour
                 if (!isAiming)
                 {
                     isAiming = true;
+                    _enemyMove.StartAiming(target.transform.position);
                 }
             
                 break;
             case State.Shoot:
+                isAiming = false;
                 _enemyMove.SetMoveAble(false);
                 _enemyStatus.Attack(target.transform);
+                EnemyShoot();
+                _state = State.Move;
                 break;
             case State.Attacked:
                     //플레이어로부터 멀어지는 스크립트
                 break;
         }
+    }
+
+    private void EnemyShoot()
+    {
+        _shotgun.Shoot(transform.up);
     }
 }

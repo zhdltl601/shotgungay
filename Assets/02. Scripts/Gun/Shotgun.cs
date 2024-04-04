@@ -10,6 +10,7 @@ public class Shotgun : MonoBehaviour
     public int bulletNum=1;
     public float shotSpreadDegree = 1f;
     public float shootRange = 1f;
+    public float bulletSpeed = 1f;
     
     public void Shoot(Vector2 shootDir)
     {
@@ -29,7 +30,7 @@ public class Shotgun : MonoBehaviour
                 shootDir.y * Mathf.Sin(randomDegree*Mathf.Deg2Rad)
             );
             Bullet ab = b.GetComponent<Bullet>();
-            
+            ab._speed = bulletSpeed;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, spreadDir, shootRange);
             if (hit.collider != null)
             {

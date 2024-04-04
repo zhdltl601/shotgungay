@@ -12,7 +12,7 @@ public class Bullet : MonoBehaviour
 
     private float progression = 0f;
     
-    private float _speed = 10f;
+    public float _speed;
     
     // Update is called once per frame
     void Update()

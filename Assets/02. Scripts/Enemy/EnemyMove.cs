@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,10 +6,16 @@ using System.Linq;
 
 public class EnemyMove : MonoBehaviour
 {
+    private EnemyState _enemyState;
     private Queue<Vector2> wayQueue = new Queue<Vector2>();
     public float moveSpeed;
     public float rotateSpeed;
     private bool doMove = false;
+
+    private void Start()
+    {
+        _enemyState = GetComponent<EnemyState>();
+    }
 
     public void SetMoveAble(bool domovement)
     {
@@ -19,6 +26,11 @@ public class EnemyMove : MonoBehaviour
         wayQueue = q;
         StopAllCoroutines();
         StartCoroutine(IMove());
+    }
+
+    public void StartAiming(Vector3 targetPos)
+    {
+        StartCoroutine(DoAim(targetPos));
     }
     IEnumerator IMove()
     {
@@ -41,16 +53,36 @@ public class EnemyMove : MonoBehaviour
         }
     }
 
-    IEnumerator DoAim()
+    IEnumerator DoAim(Vector3 targetPosition)
     {
-        while (time < moveTime)
+        Vector3 v = (targetPosition - transform.position);
+        float rotation = Mathf.Acos(Vector3.Dot(transform.up, v.normalized)) * Mathf.Rad2Deg;
+        bool isclockwise = Vector3.Cross(transform.up, v).z < 0;
+        Debug.DrawRay(transform.position, transform.up * 10, Color.blue);
+        Debug.DrawRay(transform.position, v, Color.red);
+
+        
+        if (isclockwise)
         {
-            float angle = Mathf.Atan2(lookdir.y, lookdir.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.AngleAxis(angle - 90, Vector3.forward);
-            출처: https://jugung.tistory.com/83 [죽은쥐:티스토리]
-            transform.position = Vector3.Lerp(startPoint, endPoint, time / moveTime);
-            yield return null;
-            time += Time.deltaTime;
+            print(rotation);
         }
+        else
+        {
+            print(-rotation);
+        }
+
+        float taketime = 0.1f * rotation / rotateSpeed;
+        float currenttime = 0;
+        float currentRotation = transform.rotation.eulerAngles.z;
+        while (currenttime < taketime)
+        {
+            yield return null;
+            currenttime += Time.deltaTime;
+            transform.rotation = Quaternion.Euler(0,0, Mathf.LerpAngle(currentRotation, rotation, currenttime / taketime));
+        }
+        _enemyState.PlayerAimed();
     }
+
+    
+    
 }
