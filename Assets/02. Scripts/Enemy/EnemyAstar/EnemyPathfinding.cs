@@ -56,6 +56,7 @@ public class EnemyPathfinding : MonoBehaviour
         time += Time.deltaTime;
         if (time > 0.5f)
         {
+            print("domove");
             DoMove();
             time = 0f;
         }

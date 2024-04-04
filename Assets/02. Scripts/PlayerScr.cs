@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerScr : MonoBehaviour
 {
+    public Shotgun shotgun;
+    
     private Rigidbody2D rigidBody2D;
     private Vector2 direction;
     private Vector3 mousePosition;
@@ -17,6 +19,7 @@ public class PlayerScr : MonoBehaviour
     
     private void Awake()
     {
+        shotgun = GetComponentInChildren<Shotgun>();
         rigidBody2D = GetComponent<Rigidbody2D>();
         cam = Camera.main;
     }
@@ -53,34 +56,40 @@ public class PlayerScr : MonoBehaviour
     private void Shoot()
     {
         bulletNum--;
-        Uiwadawa.ins.UpdateUi(bulletNum);
+        //Uiwadawa.ins.UpdateUi(bulletNum);
         Debug.DrawRay(transform.position, vis.transform.up * 5, Color.red, 0.5f);
         Debug.DrawRay(transform.position, (vis.transform.up - -vis.transform.right * 0.25f).normalized * 5, Color.red, 0.5f);
         Debug.DrawRay(transform.position, (vis.transform.up -  vis.transform.right * 0.25f).normalized * 5, Color.red, 0.5f);
+        shotgun.Shoot(vis.transform.up);
         CameraFuck();
+        
         //Debug.DrawRay(transform.position, mouse.transform.position, Color.red, 0.5f);
     }
     private void CameraFuck()
     {
         StopAllCoroutines();
+        cam.transform.localPosition = new Vector3(0, 0, -10f);
         StartCoroutine(Fuck());
 
     }
     private IEnumerator Fuck()
     {
-        Vector3 adawd = cam.transform.position;
-        float awd = 0.15f;
+        Vector3 cameraPos = cam.transform.position;
+        float shakeAmount = 0.15f;
+        float shakeTime = 0.15f;
         float t = 0;
-        while (t < awd)
+        while (t < shakeTime)
         {
             yield return null;
             t += Time.deltaTime;
-            Vector3 adwada = Random.insideUnitCircle * 0.25f;
-            adwada.z = cam.transform.position.z;
-            cam.transform.position = adwada;
-            
+            Vector3 shakedPosition = Random.insideUnitCircle * shakeAmount;
+            shakedPosition.z = cam.transform.position.z;
+            cam.transform.position += shakedPosition;
+
         }
-        cam.transform.position = adawd;
+        //cam.transform.position = cameraPos;
+        cam.transform.localPosition = new Vector3(0, 0, -10f);
+        
     }
 
 }
